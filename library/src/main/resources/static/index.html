@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Book Library</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 40px; background: #f4f4f9; }
+        h1 { color: #2c3e50; }
+        input, button { padding: 10px; margin: 5px; font-size: 16px; }
+        button { background: #3498db; color: white; border: none; cursor: pointer; }
+        button:hover { background: #2980b9; }
+        ul { list-style: none; padding: 0; }
+        li { background: white; margin: 8px 0; padding: 12px; border-radius: 5px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+        .error { color: red; }
+    </style>
+</head>
+<body>
+<h1>Book Library</h1>
+
+<div>
+    <input type="text" id="title" placeholder="Book Title" />
+    <input type="text" id="author" placeholder="Author" />
+    <button onclick="addBook()">Add Book</button>
+    <button onclick="loadBooks()">Refresh</button>
+</div>
+
+<ul id="bookList"></ul>
+<p id="error" class="error"></p>
+
+<script>
+    const API = "http://localhost:8080/books";
+
+    async function loadBooks() {
+        try {
+            const res = await fetch(API);
+            const books = await res.json();
+            const list = document.getElementById("bookList");
+            list.innerHTML = "";
+            books.forEach(book => {
+                const li = document.createElement("li");
+                li.textContent = `${book.id}: ${book.title} by ${book.author}`;
+                list.appendChild(li);
+            });
+            clearError();
+        } catch (err) {
+            showError("Failed to load books: " + err.message);
+        }
+    }
+
+    async function addBook() {
+        const title = document.getElementById("title").value.trim();
+        const author = document.getElementById("author").value.trim();
+        if (!title || !author) {
+            showError("Please fill both fields");
+            return;
+        }
+
+        try {
+            const res = await fetch(API, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ title, author })
+            });
+
+            if (res.ok) {
+                document.getElementById("title").value = "";
+                document.getElementById("author").value = "";
+                loadBooks();
+            } else {
+                showError("Failed to add book");
+            }
+        } catch (err) {
+            showError("Error: " + err.message);
+        }
+    }
+
+    function showError(msg) {
+        document.getElementById("error").textContent = msg;
+    }
+    function clearError() {
+        document.getElementById("error").textContent = "";
+    }
+
+    // Load books when page opens
+    loadBooks();
+</script>
+</body>
+</html>

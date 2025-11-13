@@ -1,0 +1,27 @@
+### Get all books
+GET http://localhost:8080/books
+
+### Add book
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "Java Basics",
+  "author": "You"
+}
+
+### Get Books by ID
+GET http://localhost:8080/books/1
+
+### GET book by ID (Book doesn't exist)
+GET http://localhost:8080/books/999
+
+###  Add second book
+POST http://localhost:8080/books
+Content-Type: application/json
+
+{
+  "title": "To Kill a Mockingbird",
+  "author": "Harper Lee"
+}
+
